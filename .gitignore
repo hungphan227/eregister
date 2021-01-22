@@ -1,0 +1,43 @@
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+target/
+node_modules/
+*.local.conf
+*package-lock.json
+
+#Version
+*/**/version.txt
+/ui/target/
+
+#eclipse
+.project
+.settings
+/backend/spring-based/.classpath
+.classpathversion.txt
+version.txt
+npm
+
+# IntelliJ project files 
+*.iml
+*.iws
+*.ipr
+.idea/
+
+
+# NetBeans specific
+nbproject/private/
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+backend/src/main/resources/public/
