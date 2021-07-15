@@ -19,7 +19,7 @@ node_modules/
 #eclipse
 .project
 .settings
-/backend/spring-based/.classpath
+.classpath
 .classpathversion.txt
 version.txt
 npm
