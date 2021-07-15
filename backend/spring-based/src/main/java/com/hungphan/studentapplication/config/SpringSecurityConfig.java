@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -27,6 +28,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
+    @Autowired
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
     // roles admin allow to access /admin/**
     // roles user allow to access /user/**
     // custom 403 access denied handler
@@ -35,10 +39,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.csrf().disable().authorizeRequests().antMatchers("/", "/home", "/about").permitAll()
 //                .antMatchers("/admin/**").hasAnyRole("ADMIN").antMatchers("/user/**").hasAnyRole("USER").anyRequest()
 //                .authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().permitAll();
-        
-        http.cors().and().csrf().disable().authorizeRequests().anyRequest().authenticated().and().formLogin()
+
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/static/**").permitAll()
+                .antMatchers("/*.json").permitAll()
+                .antMatchers("/*.png").permitAll()
+                .anyRequest().authenticated().and().formLogin()
                 .loginPage("/login").permitAll().successHandler(authenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler).and().exceptionHandling().accessDeniedHandler(accessDeniedHandler);
+                .failureHandler(authenticationFailureHandler).and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint);
     }
 
     // create two users, admin and user

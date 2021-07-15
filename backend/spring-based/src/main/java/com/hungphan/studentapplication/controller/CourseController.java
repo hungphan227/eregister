@@ -2,43 +2,46 @@ package com.hungphan.studentapplication.controller;
 
 import java.util.List;
 
+import akka.actor.ActorRef;
+import akka.routing.ConsistentHashingRouter;
+import com.hungphan.studentapplication.Constants;
+import com.hungphan.studentapplication.Utils;
+import com.hungphan.studentapplication.actor.ActorSystemSingleton;
+import com.hungphan.studentapplication.actor.CourseActor;
+import com.hungphan.studentapplication.actor.message.CourseMessage;
+import com.hungphan.studentapplication.dto.CourseDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hungphan.studentapplication.model.Course;
 import com.hungphan.studentapplication.repository.CourseRepository;
 import com.hungphan.studentapplication.service.CourseService;
+import org.springframework.web.context.request.async.DeferredResult;
 
 @RestController
 public class CourseController {
 
     @Autowired
     private CourseService courseService;
-    
+
     @Autowired
     private CourseRepository courseRepository;
-    
+
     @GetMapping("/courses")
-    List<Course> getAll() {
-        return courseRepository.findAll();
+    List<CourseDto> getAll() {
+        return courseService.getAllCoursesWithRemainingSlots();
     }
-    
+
     @GetMapping("/join-course/{courseId}")
-    private String joinCourse(@PathVariable Long courseId) {
-        try {
-            if (courseService.joinCourse(courseId)) {
-                return "Completed!";
-            }
-            return "Over limit!";
-        } catch (DataIntegrityViolationException exception) {
-            return "You has already assigned";
-        } catch (Exception exception) {
-            return "Unknown error";
-        }
+    private DeferredResult<ResponseEntity<String>> joinCourse(@PathVariable Long courseId) {
+        DeferredResult<ResponseEntity<String>> result = new DeferredResult<>();
+        String studentNumber = Utils.getCurrentUser();
+        ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
+        courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentNumber, result), courseId), ActorRef.noSender());
+        return result;
     }
 
 }

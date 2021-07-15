@@ -1,4 +1,4 @@
-package com.hungphan.studentapplication.config;
+package com.hungphan.studentapplication.authentication;
 
 import java.io.IOException;
 
@@ -6,14 +6,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * Used to handle forbidden access of authenticated user
+ */
 @Component
-public class MyAccessDeniedHandler implements AccessDeniedHandler {
+public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     
     public void handle(HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse,
@@ -27,8 +31,7 @@ public class MyAccessDeniedHandler implements AccessDeniedHandler {
                     + httpServletRequest.getRequestURI());
         }
 
-        httpServletResponse.sendRedirect(httpServletRequest.getContextPath() + "/403");
-
+        httpServletResponse.setStatus(HttpStatus.FORBIDDEN.value());
     }
 
 }

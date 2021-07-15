@@ -40,4 +40,4 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
-backend/src/main/resources/public/
+backend/spring-based/src/main/resources/public/
