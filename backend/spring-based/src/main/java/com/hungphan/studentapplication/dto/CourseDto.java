@@ -8,22 +8,28 @@ public class CourseDto {
     private String courseName;
     private Integer limit;
     private Integer remainingSlots;
+    private String teacher;
+    private String description;
 
     public CourseDto() {
     }
 
-    public CourseDto(Long id, String courseNumber, String courseName, Integer limit) {
+    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description) {
         this.id = id;
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.limit = limit;
+        this.teacher = teacher;
+        this.description = description;
     }
 
-    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, Integer remainingSlots) {
+    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description, Integer remainingSlots) {
         this.id = id;
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.limit = limit;
+        this.teacher = teacher;
+        this.description = description;
         this.remainingSlots = remainingSlots;
     }
 
@@ -66,4 +72,21 @@ public class CourseDto {
     public void setRemainingSlots(Integer remainingSlots) {
         this.remainingSlots = remainingSlots;
     }
+
+    public String getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(String teacher) {
+        this.teacher = teacher;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
 }

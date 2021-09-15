@@ -10,8 +10,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "StudentCourseRelation", uniqueConstraints = @UniqueConstraint(columnNames = { "studentId",
-        "courseId" }))
+@Table(name = "StudentCourseRelation", uniqueConstraints = @UniqueConstraint(columnNames = { "studentId", "courseId" }))
 public class StudentCourseRelation {
 
     @Id

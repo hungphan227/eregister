@@ -1,0 +1,41 @@
+.notification {
+    width: 350px;
+    height: 50px;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    opacity: 0.8;
+    border-radius: 5px;
+    display: flex;
+    padding: 7px;
+    font-size: 20px;
+    color: white;
+
+    .notification-first-column {
+        width: 12%;
+
+        .checkmark {
+            fill: white;
+        }
+    }
+
+    .notification-second-column {
+    }
+}
+
+.notification-info {
+    background-color: #2f96b4;
+}
+
+.notification-success {
+    background-color: #51a351;
+}
+
+.notification-warning {
+    background-color: #f89406;
+}
+
+.notification-error {
+    background-color: #bd362f;
+}
+    
