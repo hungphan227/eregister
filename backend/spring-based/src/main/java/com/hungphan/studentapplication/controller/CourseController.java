@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hungphan.studentapplication.model.Course;
@@ -35,7 +37,7 @@ public class CourseController {
         return courseService.getAllCoursesWithRemainingSlots();
     }
 
-    @GetMapping("/join-course/{courseId}")
+    @PutMapping("/join-course/{courseId}")
     private DeferredResult<ResponseEntity<String>> joinCourse(@PathVariable Long courseId) {
         DeferredResult<ResponseEntity<String>> result = new DeferredResult<>();
         String studentNumber = Utils.getCurrentUser();

@@ -38,7 +38,7 @@ public class CourseService {
         if (remainingSlots > 0) {
             Student student = studentRepository.findByStudentNumber(studentNumber);
             studentCourseRelationRepository.save(new StudentCourseRelation(student.getId(), courseId));
-            return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),remainingSlots - 1);
+            return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),course.getTeacher(),course.getDescription(),remainingSlots - 1);
         }
         return null;
     }
@@ -50,7 +50,7 @@ public class CourseService {
 
         List<CourseDto> courseDtos = new ArrayList<>();
         for(Course course : courses) {
-            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(),course.getLimit());
+            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(),course.getLimit(),course.getTeacher(),course.getDescription());
             Integer remainingSlots = mapCourseId2Students.get(course.getId())!=null?mapCourseId2Students.get(course.getId()):0;
             courseDto.setRemainingSlots(course.getLimit() - remainingSlots);
             courseDtos.add(courseDto);

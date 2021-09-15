@@ -21,6 +21,10 @@ public class Course {
     private String courseNumber;
     private String courseName;
     private Integer limit;
+    private String teacher;
+    
+    @Column(length = 1000)
+    private String description;
     
     public Course() {
         super();
@@ -65,4 +69,20 @@ public class Course {
         this.limit = limit;
     }
 
+    public String getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(String teacher) {
+        this.teacher = teacher;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
 }

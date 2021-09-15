@@ -53,7 +53,7 @@ class Login extends React.Component {
         }).then(res => {
             console.log(res)
             if (res.status === 200) {
-                this.props.history.push('/class-registration')
+                this.props.history.push('/course-registration')
             } else {
                 this.setState({
                     showLoginError: true

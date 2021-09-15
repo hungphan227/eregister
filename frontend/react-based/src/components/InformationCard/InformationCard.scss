@@ -1,0 +1,83 @@
+.information-card {
+    display: flex;
+    height: 300px;
+    width: 60%;
+    margin-bottom: 20px;
+    margin-left: 20%;
+    padding: 10px;
+    background-color: white;
+    border-radius: 10px;
+
+    .first-column {
+        display: flex;
+        flex-direction: column;
+        width: 20%;
+        padding-top: 10px;
+        padding-left: 10px;
+
+        .button {
+            margin-top: 30px;
+            margin-left: 50px;
+        }
+
+        .image {
+            height: 50%;
+            width: 70%;
+            margin-left: 20px;
+        }
+
+        // .button {
+        //     width: 40%;
+        //     height: 50px;
+        //     margin-top: 30px;
+        //     margin-left: 50px;
+        //     background-color: #ff554b;
+        //     border: 0px;
+        //     border-radius: 5px;
+        //     color: white;
+        //     font-size: 22px;
+        // }
+    }
+
+    .second-column {
+        display: flex;
+        flex-direction: column;
+        width: 40%;
+
+        .courseName {
+            font-size: 25px;
+        }
+
+        .teacher {
+            font-size: 20px;
+            color: gray;
+        }
+
+        .limit {
+            font-size: 20px;
+        }
+
+        .space {
+            margin-top: 20px;
+        }
+    }
+
+    .third-column {
+        display: flex;
+        flex-direction: column;
+        width: 40%;
+        border-left: 1px solid #e6e6e6;
+        padding-left: 20px;
+
+        .intro-title {
+            padding-left: 180px;
+            font-size: 20px;
+        }
+
+        .intro-content {
+            margin-top: 10px;
+            font-size: 17px;
+            color: grey;
+        }
+    }
+}

@@ -12,6 +12,7 @@ import com.hungphan.studentapplication.dto.CourseDto;
 import com.hungphan.studentapplication.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -34,12 +35,12 @@ public class CourseActor extends AbstractActor {
                     ObjectMapper objectMapper = new ObjectMapper();
                     VertxSingleton.getInstance().eventBus().publish("out", objectMapper.writeValueAsString(courseDto));
                 } else {
-                    result.setResult(ResponseEntity.ok("Over limit!"));
+                    result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Over limit!"));
                 }
             } catch (DataIntegrityViolationException exception) {
-                result.setResult(ResponseEntity.ok("You has already assigned"));
+                result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body("You has already registered"));
             } catch (Exception exception) {
-                result.setResult(ResponseEntity.ok("Unknown error"));
+                result.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unknown error"));
             }
         }).build();
     }
