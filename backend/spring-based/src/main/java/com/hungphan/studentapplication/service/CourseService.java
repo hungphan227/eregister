@@ -32,7 +32,7 @@ public class CourseService {
     
     @Transactional(rollbackOn={Exception.class})
     public CourseDto joinCourse(Long courseId, String studentNumber) {
-        int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInACourse(courseId);
+        int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
         Course course = courseRepository.findById(courseId).get();
         int remainingSlots = course.getLimit() - numberOfStudentsInTheCourse;
         if (remainingSlots > 0) {
@@ -56,6 +56,13 @@ public class CourseService {
             courseDtos.add(courseDto);
         }
         return courseDtos;
+    }
+    
+    public CourseDto getCourseWithRemainingSlots(Long courseId) {
+        int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
+        Course course = courseRepository.findById(courseId).get();
+        int remainingSlots = course.getLimit() - numberOfStudentsInTheCourse;
+        return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),course.getTeacher(),course.getDescription(),remainingSlots);
     }
 
 }

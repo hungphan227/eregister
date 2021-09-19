@@ -3,13 +3,15 @@ package com.hungphan.studentapplication.actor.message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.hungphan.studentapplication.message.HttpResponseMessage;
+
 public class CourseMessage {
 
     private Long courseId;
     private String studentNumber;
-    private DeferredResult<ResponseEntity<String>> httpResult;
+    private DeferredResult<ResponseEntity<HttpResponseMessage>> httpResult;
 
-    public CourseMessage(Long courseId, String studentNumber, DeferredResult<ResponseEntity<String>> httpResult) {
+    public CourseMessage(Long courseId, String studentNumber, DeferredResult<ResponseEntity<HttpResponseMessage>> httpResult) {
         this.courseId = courseId;
         this.studentNumber = studentNumber;
         this.httpResult = httpResult;
@@ -31,11 +33,11 @@ public class CourseMessage {
         this.studentNumber = studentNumber;
     }
 
-    public DeferredResult<ResponseEntity<String>> getHttpResult() {
+    public DeferredResult<ResponseEntity<HttpResponseMessage>> getHttpResult() {
         return httpResult;
     }
 
-    public void setHttpResult(DeferredResult<ResponseEntity<String>> httpResult) {
+    public void setHttpResult(DeferredResult<ResponseEntity<HttpResponseMessage>> httpResult) {
         this.httpResult = httpResult;
     }
 }
