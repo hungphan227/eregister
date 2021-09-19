@@ -10,7 +10,6 @@ hs_err_pid*
 target/
 node_modules/
 *.local.conf
-*package-lock.json
 
 #Version
 */**/version.txt

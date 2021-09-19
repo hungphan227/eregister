@@ -10,6 +10,8 @@ import com.hungphan.studentapplication.actor.ActorSystemSingleton;
 import com.hungphan.studentapplication.actor.CourseActor;
 import com.hungphan.studentapplication.actor.message.CourseMessage;
 import com.hungphan.studentapplication.dto.CourseDto;
+import com.hungphan.studentapplication.message.HttpResponseMessage;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,10 +38,15 @@ public class CourseController {
     List<CourseDto> getAll() {
         return courseService.getAllCoursesWithRemainingSlots();
     }
+    
+    @GetMapping("/course/{courseId}")
+    CourseDto getCourse(@PathVariable Long courseId) {
+        return courseService.getCourseWithRemainingSlots(courseId);
+    }
 
     @PutMapping("/join-course/{courseId}")
-    private DeferredResult<ResponseEntity<String>> joinCourse(@PathVariable Long courseId) {
-        DeferredResult<ResponseEntity<String>> result = new DeferredResult<>();
+    private DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId) {
+        DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
         String studentNumber = Utils.getCurrentUser();
         ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
         courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentNumber, result), courseId), ActorRef.noSender());

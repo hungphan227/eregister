@@ -14,7 +14,7 @@ class InformationCard extends React.Component {
         return(
             <div className='information-card'>
                 <div className='first-column'>
-                    <img src={computerScience} className='image'></img>
+                    <img src={computerScience} className='image' alt='course icon'></img>
                     <div>
                         <Button name='Book' handleClick={handleClickButton} />
                     </div>

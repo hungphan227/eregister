@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import com.hungphan.studentapplication.actor.ActorSystemSingleton;
 import com.hungphan.studentapplication.actor.CourseActor;
@@ -22,6 +23,9 @@ public class Application {
     @Autowired
     private RemainingSlotController remainingSlotController;
     
+    @Autowired
+    private RedisTemplate redisTemplate;
+    
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(Application.class, args);
 
@@ -36,6 +40,9 @@ public class Application {
         Vertx vertx = VertxSingleton.getInstance();
         vertx.deployVerticle(remainingSlotController);
         System.out.println("Initialization finished");
+        
+//        redisTemplate.opsForValue().set("loda", "hello world");
+//        System.out.println("Value of key loda: " + redisTemplate.opsForValue().get("loda"));
     }
     
 //    @Profile("first")

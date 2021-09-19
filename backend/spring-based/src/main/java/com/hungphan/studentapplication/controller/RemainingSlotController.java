@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class RemainingSlotController extends AbstractVerticle {
-
+    
     @Override
     public void start() throws Exception {
 //        HttpServer httpServer = vertx.createHttpServer();
@@ -36,7 +36,7 @@ public class RemainingSlotController extends AbstractVerticle {
 
         Router router = Router.router(vertx);
 
-        router.route("/remainingSlots/*").handler(eventBusHandler());
+        router.route("/websocket/*").handler(eventBusHandler());
         router.route().handler(staticHandler());
 
         vertx.createHttpServer()
@@ -48,7 +48,7 @@ public class RemainingSlotController extends AbstractVerticle {
 
     private SockJSHandler eventBusHandler() {
         BridgeOptions options = new BridgeOptions()
-                .addOutboundPermitted(new PermittedOptions().setAddressRegex("out"))
+                .addOutboundPermitted(new PermittedOptions().setAddressRegex("remainingSlots"))
                 .addInboundPermitted(new PermittedOptions().setAddressRegex("in"));
 
         EventBus eventBus = vertx.eventBus();

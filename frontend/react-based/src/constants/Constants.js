@@ -1,0 +1,14 @@
+const SCREEN_NAMES = {
+    SCREEN_LOGIN: '/login',
+    SCREEN_COURSE_REGISTRATION: '/course-registration'
+}
+
+const COMMANDS = {
+    GET_COURSE: 'GET_COURSE'
+}
+
+const INTERNAL_EVENTS = {
+    GET_COURSE: 'GET_COURSE'
+}
+
+export { SCREEN_NAMES, COMMANDS, INTERNAL_EVENTS }

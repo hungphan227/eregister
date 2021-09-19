@@ -3,6 +3,9 @@ import Card from 'react-bootstrap/Card'
 import {Form} from 'react-bootstrap'
 import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import service from '../service/Service'
+import { history } from '../routes/Routes'
+import { SCREEN_NAMES } from '../constants/Constants'
 
 class Login extends React.Component {
 
@@ -31,8 +34,8 @@ class Login extends React.Component {
                                 <Form.Control type="password" placeholder="Enter password" onChange={(event) => {this.state.password = event.target.value}}/>
                             </Form.Group>
 
-                            <Button variant="primary" onClick={this.submit}>
-                                Submit
+                            <Button variant="primary" onClick={this.handleClickLogin}>
+                                Login
                             </Button>
                         </Form>
                     </Card.Body>
@@ -42,27 +45,37 @@ class Login extends React.Component {
         )
     }
 
-    submit = () => {
-        return fetch("/login", {
-            method: 'POST',
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            mode: 'no-cors',
-            body: 'username=' + this.state.username + '&password=' + this.state.password
-        }).then(res => {
-            console.log(res)
-            if (res.status === 200) {
-                this.props.history.push('/course-registration')
-            } else {
-                this.setState({
-                    showLoginError: true
-                })
-            }
-        }).catch(error => {
-            console.log(error)
+    handleClickLogin = () => {
+        service.login(this.state.username, this.state.password, () => {
+            history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
+        }, () => {
+            this.setState({
+                showLoginError: true
+            })
         })
     }
+
+    // submit = () => {
+    //     return fetch("/login", {
+    //         method: 'POST',
+    //         headers: {
+    //             "Content-Type": "application/x-www-form-urlencoded",
+    //         },
+    //         mode: 'no-cors',
+    //         body: 'username=' + this.state.username + '&password=' + this.state.password
+    //     }).then(res => {
+    //         console.log(res)
+    //         if (res.status === 200) {
+    //             this.props.history.push('/course-registration')
+    //         } else {
+    //             this.setState({
+    //                 showLoginError: true
+    //             })
+    //         }
+    //     }).catch(error => {
+    //         console.log(error)
+    //     })
+    // }
 }
 
 export default Login
