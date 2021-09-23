@@ -2,6 +2,8 @@ package com.hungphan.studentapplication;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,6 +13,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import com.hungphan.studentapplication.actor.ActorSystemSingleton;
 import com.hungphan.studentapplication.actor.CourseActor;
 import com.hungphan.studentapplication.config.SpringExtension;
+import com.hungphan.studentapplication.controller.RedisMessageListener;
 import com.hungphan.studentapplication.controller.RemainingSlotController;
 
 import akka.actor.ActorSystem;
@@ -19,6 +22,8 @@ import io.vertx.core.Vertx;
 
 @SpringBootApplication
 public class Application {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
     @Autowired
     private RemainingSlotController remainingSlotController;
@@ -39,7 +44,7 @@ public class Application {
     public void postConstruct() {
         Vertx vertx = VertxSingleton.getInstance();
         vertx.deployVerticle(remainingSlotController);
-        System.out.println("Initialization finished");
+        LOGGER.info("Spring initialization finished");
         
 //        redisTemplate.opsForValue().set("loda", "hello world");
 //        System.out.println("Value of key loda: " + redisTemplate.opsForValue().get("loda"));

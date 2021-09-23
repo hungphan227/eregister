@@ -10,10 +10,17 @@ import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.hungphan.studentapplication.service.CourseService;
 
 @Component
 public class RemainingSlotController extends AbstractVerticle {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemainingSlotController.class);
     
     @Override
     public void start() throws Exception {
@@ -43,7 +50,7 @@ public class RemainingSlotController extends AbstractVerticle {
                 .requestHandler(router::accept)
                 .listen(9997);
 
-        System.out.println("Websocket server started!!!");
+        LOGGER.info("Websocket server started!!!");
     }
 
     private SockJSHandler eventBusHandler() {

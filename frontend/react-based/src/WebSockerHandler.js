@@ -21,8 +21,8 @@ class WebSocketHandler extends React.Component {
             vertxbus_reconnect_exponent: 2, // Exponential backoff factor
             vertxbus_randomization_factor: 0.5, // Randomization factor between 0 and 1
         }
-
-        let eventBus = new EventBus('http://localhost:9997/websocket', options)
+        
+        let eventBus = new EventBus('http://'+window.location.hostname+':9997/websocket', options)
         eventBus.enableReconnect(true)
         eventBus.onopen = () => {
             console.log('Open new connection with websocket server');

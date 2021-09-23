@@ -1,11 +1,16 @@
 package com.hungphan.studentapplication.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.ext.bridge.BridgeEventType;
 import io.vertx.ext.web.handler.sockjs.BridgeEvent;
 
 public class RemainingSlotHandler implements Handler<BridgeEvent> {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(RemainingSlotHandler.class);
 
     private final EventBus eventBus;
 
@@ -16,11 +21,11 @@ public class RemainingSlotHandler implements Handler<BridgeEvent> {
     @Override
     public void handle(BridgeEvent event) {
         if (event.type() == BridgeEventType.SOCKET_CREATED) {
-            System.out.println("A socket was created");
+            LOGGER.info("A web socket was created");
         }
 
         if (event.type() == BridgeEventType.SEND) {
-            System.out.println("Receive: " + event.getRawMessage().getJsonObject("body"));
+            LOGGER.info("Receive from web socket client: {}", event.getRawMessage().getJsonObject("body"));
         }
 
         event.complete(true);

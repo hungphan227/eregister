@@ -15,7 +15,11 @@ import com.hungphan.studentapplication.message.HttpResponseMessage;
 import com.hungphan.studentapplication.message.SentWebSocketMessage;
 import com.hungphan.studentapplication.message.SentWebSocketMessageType;
 import com.hungphan.studentapplication.service.CourseService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -24,6 +28,11 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 @Actor
 public class CourseActor extends AbstractActor {
+    
+    private static Logger LOGGER = LoggerFactory.getLogger(CourseActor.class);
+    
+    @Value("${redis.enabled}")
+    private boolean isRedisEnable;
 
     @Autowired
     private CourseService courseService;
@@ -41,9 +50,12 @@ public class CourseActor extends AbstractActor {
                 CourseDto courseDto = courseService.joinCourse(courseId, studentNumber);
                 if (courseDto != null) {
                     result.setResult(ResponseEntity.status(HttpStatus.OK).body(new HttpResponseMessage("Completed!")));
-                    redisTemplate.convertAndSend("getCourse", courseId.toString());
-                    VertxSingleton.getInstance().eventBus().publish("remainingSlots", Utils.convertFromObjectToJson(
-                            new SentWebSocketMessage(SentWebSocketMessageType.COMMAND, Commands.GET_COURSE, courseId.toString())));
+                    if (isRedisEnable) {
+                        redisTemplate.convertAndSend("getCourse", courseId.toString());
+                    } else {
+                        VertxSingleton.getInstance().eventBus().publish("remainingSlots", Utils.convertFromObjectToJson(
+                                new SentWebSocketMessage(SentWebSocketMessageType.COMMAND, Commands.GET_COURSE, courseId.toString())));
+                    }
                 } else {
                     result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponseMessage("Over limit!")));
                 }
