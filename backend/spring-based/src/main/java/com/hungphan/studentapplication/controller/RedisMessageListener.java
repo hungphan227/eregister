@@ -1,5 +1,7 @@
 package com.hungphan.studentapplication.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
@@ -11,9 +13,11 @@ import com.hungphan.studentapplication.message.SentWebSocketMessageType;
 
 public class RedisMessageListener implements MessageListener {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(RedisMessageListener.class);
+    
     @Override
     public void onMessage(final Message message, final byte[] pattern) {
-        System.out.println("Message received: " + message.toString());
+        LOGGER.info("Receive message from redis: " + message.toString());
         String courseId = message.toString();
         try {
             VertxSingleton.getInstance().eventBus().publish("remainingSlots", Utils.convertFromObjectToJson(

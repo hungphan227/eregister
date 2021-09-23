@@ -18,6 +18,20 @@ class Login extends React.Component {
         }
     }
 
+    componentDidMount() {
+        service.checkAuthentication();
+    }
+
+    handleClickLogin = () => {
+        service.login(this.state.username, this.state.password, () => {
+            history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
+        }, () => {
+            this.setState({
+                showLoginError: true
+            })
+        })
+    }
+
     render() {
         return (
             <div style={{ width: '500px', margin: 'auto', marginTop: '300px' }}>
@@ -34,7 +48,7 @@ class Login extends React.Component {
                                 <Form.Control type="password" placeholder="Enter password" onChange={(event) => {this.state.password = event.target.value}}/>
                             </Form.Group>
 
-                            <Button variant="primary" onClick={this.handleClickLogin}>
+                            <Button variant="secondary" onClick={this.handleClickLogin}>
                                 Login
                             </Button>
                         </Form>
@@ -43,16 +57,6 @@ class Login extends React.Component {
                 {this.state.showLoginError?<i style={{color:'red'}}>Wrong username or password</i>:''}
             </div>
         )
-    }
-
-    handleClickLogin = () => {
-        service.login(this.state.username, this.state.password, () => {
-            history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
-        }, () => {
-            this.setState({
-                showLoginError: true
-            })
-        })
     }
 
     // submit = () => {

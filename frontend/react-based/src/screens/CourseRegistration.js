@@ -19,8 +19,6 @@ class CourseRegistration extends React.Component {
             showPopup: false,
             popupContent: ''
         }
-        // this.getCourses()
-        // this.callSocket()
     }
 
     componentDidMount() {

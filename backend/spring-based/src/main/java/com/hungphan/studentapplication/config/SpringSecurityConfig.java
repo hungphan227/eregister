@@ -12,6 +12,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -30,6 +31,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
+    
+    @Autowired
+    private LogoutSuccessHandler logoutSuccessHandler;
 
     // roles admin allow to access /admin/**
     // roles user allow to access /user/**
@@ -43,10 +47,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests().antMatchers("/static/**").permitAll()
                 .antMatchers("/*.json").permitAll()
                 .antMatchers("/*.png").permitAll()
+                .antMatchers("/course-registration").permitAll()
                 .anyRequest().authenticated().and().formLogin()
                 .loginPage("/login").permitAll().successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler).and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .and().logout().logoutSuccessHandler(logoutSuccessHandler);
     }
 
     // create two users, admin and user

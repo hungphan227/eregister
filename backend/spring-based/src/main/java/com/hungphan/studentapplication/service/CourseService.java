@@ -1,7 +1,11 @@
 package com.hungphan.studentapplication.service;
 
+import com.hungphan.studentapplication.Application;
 import com.hungphan.studentapplication.dto.CourseDto;
 import com.hungphan.studentapplication.dto.CourseStatusDto;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +25,8 @@ import java.util.stream.Collectors;
 @Component
 public class CourseService {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseService.class);
+    
     @Autowired
     private StudentRepository studentRepository;
     
@@ -38,6 +44,7 @@ public class CourseService {
         if (remainingSlots > 0) {
             Student student = studentRepository.findByStudentNumber(studentNumber);
             studentCourseRelationRepository.save(new StudentCourseRelation(student.getId(), courseId));
+            LOGGER.info("Save new StudentCourseRelation student {} course {} into database", student.getStudentNumber(), course.getCourseNumber());
             return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),course.getTeacher(),course.getDescription(),remainingSlots - 1);
         }
         return null;
