@@ -13,14 +13,16 @@ import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.hungphan.studentapplication.service.CourseService;
 
 @Component
 public class RemainingSlotController extends AbstractVerticle {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(RemainingSlotController.class);
+    
+    @Value("${websocket.server.port}")
+    private int port;
     
     @Override
     public void start() throws Exception {
@@ -48,7 +50,7 @@ public class RemainingSlotController extends AbstractVerticle {
 
         vertx.createHttpServer()
                 .requestHandler(router::accept)
-                .listen(9997);
+                .listen(port);
 
         LOGGER.info("Websocket server started!!!");
     }
