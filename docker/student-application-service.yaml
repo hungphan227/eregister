@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: student-application
+  namespace: ingress-nginx
+spec:
+  selector:
+    app: student-application
+  ports:
+  - name: http-port
+    protocol: TCP
+    targetPort: 9998
+    port: 9998
+#    nodePort: 9998
+  - name: websocket-port
+    protocol: TCP
+    targetPort: 9997
+    port: 9997
+#    nodePort: 9997
+#  type: NodePort

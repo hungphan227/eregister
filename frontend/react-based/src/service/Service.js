@@ -1,7 +1,18 @@
 import { history } from "../routes/Routes"
-import { SCREEN_NAMES } from '../constants/Constants'
+import { SCREEN_NAMES, INTERNAL_EVENTS } from '../constants/Constants'
+import internalEventBus from "../InternalEventBus"
 
 const service = {
+    getClientSessionId() {
+        fetch("/get-client-session-id", {
+            method: 'GET'
+        }).then(res => {
+            console.log('getClientSessionId res status:', res.status)
+        }).catch(error => {
+            console.error(error)
+        })
+    },
+
     login(username, password, onSuccess, onError) {
         fetch("/login", {
             method: 'POST',
@@ -21,13 +32,13 @@ const service = {
         })
     },
 
-    checkAuthentication() {
+    checkAuthentication(onSuccess) {
         fetch("/check-authentication", {
             method: 'GET'
         }).then(res => {
             console.log('checkAuthentication res status:', res.status)
             if (res.status === 200) {
-                history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
+                onSuccess()
             }
         }).catch(error => {
             console.error(error)
@@ -40,6 +51,7 @@ const service = {
         }).then(res => {
             console.log('logout res status:', res.status)
             if (res.status === 200) {
+                internalEventBus.dispatch(INTERNAL_EVENTS.CLOSE_WEB_SOCKET, {})
                 history.push(SCREEN_NAMES.SCREEN_LOGIN)
             }
         }).catch(error => {

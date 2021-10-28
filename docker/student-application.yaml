@@ -1,0 +1,35 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: student-application
+  namespace: ingress-nginx
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: student-application
+  template:
+    metadata:
+      labels:
+        app: student-application
+    spec:
+      hostAliases:
+      - ip: "192.168.204.129"
+        hostnames:
+        - "dbserver"
+        - "redis-server"
+      containers:
+      - name: student-application
+        imagePullPolicy: Never
+        image: student-application
+        ports:
+        - containerPort: 9998
+        - containerPort: 9997
+#        volumeMounts:
+#        - mountPath: /var/log/student-application
+#          name: test-volume
+#      volumes:
+#      - name: test-volume
+#        hostPath:
+#          path: /home/hung/data/docker/docker-data/log/student-application
+#          type: Directory

@@ -5,7 +5,8 @@ import Button from 'react-bootstrap/Button'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import service from '../service/Service'
 import { history } from '../routes/Routes'
-import { SCREEN_NAMES } from '../constants/Constants'
+import { SCREEN_NAMES, INTERNAL_EVENTS } from '../constants/Constants'
+import internalEventBus from '../InternalEventBus'
 
 class Login extends React.Component {
 
@@ -19,11 +20,14 @@ class Login extends React.Component {
     }
 
     componentDidMount() {
-        service.checkAuthentication();
+        service.checkAuthentication(() => {
+            history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
+        })
     }
 
     handleClickLogin = () => {
         service.login(this.state.username, this.state.password, () => {
+            internalEventBus.dispatch(INTERNAL_EVENTS.OPEN_WEB_SOCKET, {})
             history.push(SCREEN_NAMES.SCREEN_COURSE_REGISTRATION)
         }, () => {
             this.setState({
