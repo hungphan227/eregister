@@ -1,6 +1,7 @@
 package com.hungphan.eregister.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,6 +14,9 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -44,7 +48,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/admin/**").hasAnyRole("ADMIN").antMatchers("/user/**").hasAnyRole("USER").anyRequest()
 //                .authenticated().and().formLogin().loginPage("/login").permitAll().and().logout().permitAll();
 
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers("/static/**").permitAll()
+        http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable().authorizeRequests().antMatchers("/static/**").permitAll()
                 .antMatchers("/*.json").permitAll()
                 .antMatchers("/*.png").permitAll()
                 .antMatchers("/get-client-session-id", "/course-registration").permitAll()
@@ -61,5 +65,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 //        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
 //        String encodedPassword = encoder.encode("1");
         auth.authenticationProvider(authenticationProvider);
+    }
+
+    private CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
     }
 }
