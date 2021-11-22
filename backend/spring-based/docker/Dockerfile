@@ -1,6 +1,6 @@
 FROM openjdk:8
-ADD student-application-1.0.0.jar student-application-1.0.0.jar
+ADD eregister-1.0.0.jar eregister-1.0.0.jar
 # RUN apt-get install vim
 # RUN apt-get install telnet
-RUN mkdir -p /var/log/student-application && touch /var/log/student-application/student-application.log
-CMD java -jar student-application-1.0.0.jar > /var/log/student-application/student-application.log 2>&1
+RUN mkdir -p /var/log/eregister && touch /var/log/eregister/eregister.log
+CMD java -jar eregister-1.0.0.jar > /var/log/eregister/eregister.log 2>&1

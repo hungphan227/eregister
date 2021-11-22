@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: student-application
+  name: eregister
   namespace: ingress-nginx
 spec:
   selector:
-    app: student-application
+    app: eregister
   ports:
   - name: http-port
     protocol: TCP

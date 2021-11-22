@@ -1,17 +1,17 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: student-application
+  name: eregister
   namespace: ingress-nginx
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: student-application
+      app: eregister
   template:
     metadata:
       labels:
-        app: student-application
+        app: eregister
     spec:
       hostAliases:
       - ip: "192.168.204.129"
@@ -19,17 +19,17 @@ spec:
         - "dbserver"
         - "redis-server"
       containers:
-      - name: student-application
+      - name: eregister
         imagePullPolicy: Never
-        image: student-application
+        image: eregister
         ports:
         - containerPort: 9998
         - containerPort: 9997
 #        volumeMounts:
-#        - mountPath: /var/log/student-application
+#        - mountPath: /var/log/eregister
 #          name: test-volume
 #      volumes:
 #      - name: test-volume
 #        hostPath:
-#          path: /home/hung/data/docker/docker-data/log/student-application
+#          path: /home/hung/data/docker/docker-data/log/eregister
 #          type: Directory
