@@ -1,59 +1,33 @@
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import org.apache.http.HttpHost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 
 public class Test {
 
     public static void main(String[] args) throws Exception {
-        int n = 112;
-        if ((n & 1 ) == 0) {
-            System.out.println("even");
-        }
+        RestClient restClient = RestClient.builder(
+                new HttpHost("localhost", 9200, "http")).build();
+        System.out.println("---------------------------STARTED----------------------------");
+
+        Request request = new Request(
+                "GET",
+                "/studentmngm/_search");
+        request.setEntity(new NStringEntity(
+                "{\n" +
+                        "    \"query\": {\n" +
+                        "        \"query_string\": {\n" +
+                        "            \"query\": \"AAA Dijkstra\"\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}",
+                ContentType.APPLICATION_JSON));
+        Response response = restClient.performRequest(request);
+        String responseBody = EntityUtils.toString(response.getEntity());
+        System.out.println(responseBody);
     }
 
-    public static void checkTry() {
-        try {
-            return;
-        } finally {
-            System.out.println("final");
-        }
-    }
-
-    public static void startServer() {
-        try {
-            ServerSocket serverSocket = new ServerSocket(1234);
-            Socket socket = serverSocket.accept();
-//            BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            String s = input.readUTF();
-            System.out.println("Server receive: " + s);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void startClient() {
-        try {
-            Socket socket = new Socket("localhost", 1234);
-//            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//            String s = "abc";
-//            dataOutputStream.writeUTF(s);
-            System.out.println("Client ends");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-}
-
-class Parent {
-    public static String getName() {
-        return "parent";
-    }
-}
-
-class Child extends Parent {
-    public static String getName() {
-        return "child";
-    }
 }
