@@ -1,5 +1,7 @@
 package com.hungphan.eregister.repository;
 
+import com.hungphan.eregister.dto.CourseDto;
+import com.hungphan.eregister.model.Course;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -15,5 +17,9 @@ public interface StudentCourseRelationRepository extends JpaRepository<StudentCo
 
     @Query("select new com.hungphan.eregister.dto.CourseStatusDto(courseId, count(id)) from StudentCourseRelation group by courseId")
     List<CourseStatusDto> getCourseStatus();
+
+    @Query("select new com.hungphan.eregister.dto.CourseStatusDto(sc.courseId, count(sc.id)) " +
+            "from StudentCourseRelation sc join Course c on sc.courseId=c.id where c.courseNumber in ?1 group by sc.courseId")
+    List<CourseStatusDto> countNumberOfStudentInCourses(List<String> courseNumbers);
     
 }

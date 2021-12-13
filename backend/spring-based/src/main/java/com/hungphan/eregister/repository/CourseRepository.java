@@ -9,5 +9,7 @@ import com.hungphan.eregister.model.Course;
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
+    List<Course> findByCourseNumberIn(List<String> courseNumbers);
     
 }

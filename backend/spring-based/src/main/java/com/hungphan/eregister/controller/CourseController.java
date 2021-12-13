@@ -6,6 +6,7 @@ import akka.actor.ActorRef;
 import akka.routing.ConsistentHashingRouter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +45,19 @@ public class CourseController {
         return courseService.getCourseWithRemainingSlots(courseId);
     }
 
+    @GetMapping("/course/search/{searchString}")
+    ResponseEntity<List<CourseDto>> searchCourses(@PathVariable String searchString) {
+        List<CourseDto> list = null;
+        try {
+            list = courseService.searchCourses(searchString);
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(list);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
     @PutMapping("/join-course/{courseId}")
-    private DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId) {
+    DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId) {
         DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
         String studentNumber = Utils.getCurrentUser();
         ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());

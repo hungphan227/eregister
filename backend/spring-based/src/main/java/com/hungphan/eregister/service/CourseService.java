@@ -1,5 +1,13 @@
 package com.hungphan.eregister.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.entity.ContentType;
+import org.apache.http.nio.entity.NStringEntity;
+import org.apache.http.util.EntityUtils;
+import org.elasticsearch.client.Request;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +42,9 @@ public class CourseService {
     
     @Autowired
     private StudentCourseRelationRepository studentCourseRelationRepository;
+
+    @Autowired
+    private RestClient elasticClient;
     
     @Transactional(rollbackOn={Exception.class})
     public CourseDto joinCourse(Long courseId, String studentNumber) {
@@ -69,6 +80,51 @@ public class CourseService {
         Course course = courseRepository.findById(courseId).get();
         int remainingSlots = course.getLimit() - numberOfStudentsInTheCourse;
         return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),course.getTeacher(),course.getDescription(),remainingSlots);
+    }
+
+    public List<CourseDto> searchCourses(String searchString) throws Exception {
+        List<String> courseNumbers = getDataFromElastic(searchString);
+        List<Course> courses = courseRepository.findByCourseNumberIn(courseNumbers);
+        List<CourseStatusDto> listCourseStatusDto = studentCourseRelationRepository.countNumberOfStudentInCourses(courseNumbers);
+        Map<Long, Integer> mapCourseId2Students = listCourseStatusDto.stream().collect(Collectors.toMap(CourseStatusDto::getCourseId, CourseStatusDto::getNumberOfStudents));
+        List<CourseDto> listCourseDto = new ArrayList<>();
+        for(Course course : courses) {
+            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(),course.getLimit(),course.getTeacher(),course.getDescription());
+            Integer remainingSlots = mapCourseId2Students.get(course.getId())!=null?mapCourseId2Students.get(course.getId()):0;
+            courseDto.setRemainingSlots(course.getLimit() - remainingSlots);
+            listCourseDto.add(courseDto);
+        }
+        return listCourseDto;
+    }
+
+    private List<String> getDataFromElastic(String searchString) throws Exception {
+        List<String> courseNumbers = new ArrayList<>();
+        Request request = new Request(
+                "GET",
+                "/studentmngm/_search");
+        request.setEntity(new NStringEntity(
+                "{\n" +
+                        "    \"query\": {\n" +
+                        "        \"multi_match\": {\n" +
+                        "            \"query\": \"" + searchString + "\",\n" +
+                        "            \"type\": \"phrase\",\n" +
+                        "            \"fields\": [\n" +
+                        "                \"course_name\",\n" +
+                        "                \"course_number\",\n" +
+                        "                \"teacher\",\n" +
+                        "                \"description\"\n" +
+                        "            ]\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "}",
+                ContentType.APPLICATION_JSON));
+        Response response = elasticClient.performRequest(request);
+        String responseBody = EntityUtils.toString(response.getEntity());
+        final JsonNode root = new ObjectMapper().readTree(responseBody);
+        for (JsonNode node : root.get("hits").get("hits")) {
+            courseNumbers.add(node.get("_source").get("course_number").asText());
+        }
+        return courseNumbers;
     }
 
 }

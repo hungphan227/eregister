@@ -1,0 +1,38 @@
+// analyzer: character filter, tokenizer, token filter
+
+http://localhost:9200/studentmngm
+
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "my_english_analyzer": {
+          "type": "standard",
+          "stopwords": "_english_"
+        }
+      }
+    }
+  }
+}
+
+{
+    "mappings": {
+        "properties": {
+            "course_name": {
+                "type": "text"
+            },
+            "course_number": {
+                "type": "keyword"
+            },
+            "limit": {
+                "type": "integer"
+            },
+            "teacher": {
+                "type": "text"
+            },
+            "description": {
+                "type": "text"
+            }
+        }
+    }
+}
