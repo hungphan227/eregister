@@ -40,3 +40,4 @@ nbactions.xml
 nb-configuration.xml
 
 backend/spring-based/src/main/resources/public/
+.eslintcache
