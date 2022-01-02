@@ -1,0 +1,19 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: network-multitool
+  namespace: ingress-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-multitool
+  template:
+    metadata:
+      labels:
+        app: network-multitool
+    spec:
+      containers:
+      - name: network-multitool
+        imagePullPolicy: IfNotPresent
+        image: praqma/network-multitool

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: eregister
+eureka:
+  client:
+    serviceURL:
+      defaultZone: http://eregister-discovery-service:8761/eureka
+  instance:
+    preferIpAddress: true

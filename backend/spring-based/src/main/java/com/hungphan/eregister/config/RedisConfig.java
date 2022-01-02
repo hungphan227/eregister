@@ -24,6 +24,9 @@ public class RedisConfig {
     @Value("${redis.port}")
     private int redisPort;
 
+    @Value("${redis.enabled}")
+    private boolean redisEnabled;
+
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
@@ -47,8 +50,10 @@ public class RedisConfig {
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory redisConnectionFactory) {
         final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(redisConnectionFactory);
-        container.addMessageListener(messageListener(), topic() );
+        if (redisEnabled) {
+            container.setConnectionFactory(redisConnectionFactory);
+            container.addMessageListener(messageListener(), topic() );
+        }
         return container;
     }
     

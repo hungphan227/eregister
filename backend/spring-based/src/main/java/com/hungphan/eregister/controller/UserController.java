@@ -1,5 +1,7 @@
 package com.hungphan.eregister.controller;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
@@ -31,8 +33,13 @@ public class UserController {
                 if (CLIENT_SESSION_ID_NAME.equals(cookie.getName())) return;
             }
         }
-        String sessionId = UUID.randomUUID().toString();
-        LOGGER.info("Client session id: {}", sessionId);
+        String sessionId = "";
+        try {
+            sessionId = InetAddress.getLocalHost().getHostAddress();
+            LOGGER.info("Client session id: {}", sessionId);
+        } catch (UnknownHostException e) {
+            LOGGER.error("Cannot get ip address");
+        }
         Cookie cookie = new Cookie(CLIENT_SESSION_ID_NAME, sessionId);
         response.addCookie(cookie);
     }

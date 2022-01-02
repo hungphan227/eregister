@@ -4,10 +4,11 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.shareddata.SharedData;
+import io.vertx.ext.bridge.BridgeOptions;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.StaticHandler;
-import io.vertx.ext.web.handler.sockjs.BridgeOptions;
+import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import io.vertx.ext.web.handler.sockjs.SockJSHandlerOptions;
 
@@ -44,19 +45,17 @@ public class RemainingSlotController extends AbstractVerticle {
 //        httpServer.requestHandler(router).listen(9997);
 
         Router router = Router.router(vertx);
-
-        router.route("/websocket/*").handler(eventBusHandler());
-        router.route().handler(staticHandler());
+        router.mountSubRouter("/websocket", eventBusHandler());
 
         vertx.createHttpServer()
-                .requestHandler(router::accept)
+                .requestHandler(router)
                 .listen(port);
 
-        LOGGER.info("Websocket server started!!!");
+        LOGGER.info("Websocket server started on the port {}", port);
     }
 
-    private SockJSHandler eventBusHandler() {
-        BridgeOptions options = new BridgeOptions()
+    private Router eventBusHandler() {
+        SockJSBridgeOptions options = new SockJSBridgeOptions()
                 .addOutboundPermitted(new PermittedOptions().setAddressRegex("remainingSlots"))
                 .addInboundPermitted(new PermittedOptions().setAddressRegex("in"));
 
