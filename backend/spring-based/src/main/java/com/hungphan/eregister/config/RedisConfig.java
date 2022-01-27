@@ -41,8 +41,8 @@ public class RedisConfig {
         template.setValueSerializer(new GenericToStringSerializer<Object>(Object.class));
         return template;
     }
-    
-    @Bean
+
+    // TODO removed the bean annotation but not do smoke test yet
     public MessageListenerAdapter messageListener() {
         return new MessageListenerAdapter(new RedisMessageListener());
     }
