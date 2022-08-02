@@ -20,7 +20,7 @@ public class Course {
 
     private String courseNumber;
     private String courseName;
-    private Integer limit;
+    private Integer courseLimit;
     private String teacher;
     
     @Column(length = 1000)
@@ -34,7 +34,7 @@ public class Course {
         super();
         this.courseNumber = courseNumber;
         this.courseName = courseName;
-        this.limit = limit;
+        this.courseLimit = limit;
     }
 
     public Long getId() {
@@ -62,11 +62,11 @@ public class Course {
     }
 
     public Integer getLimit() {
-        return limit;
+        return courseLimit;
     }
 
     public void setLimit(Integer limit) {
-        this.limit = limit;
+        this.courseLimit = limit;
     }
 
     public String getTeacher() {
