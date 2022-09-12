@@ -1,5 +1,12 @@
 # where to put frontend
 
+src/main/resources/public 
+
+# environment version
+
+java: 8
+nodejs: 14.15.4
+
 src/main/resources/public
 
 # run docker
