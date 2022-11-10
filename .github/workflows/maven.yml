@@ -29,3 +29,5 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn clean package --file backend/spring-based/pom.xml
+    - name: Build the Docker image
+      run: docker build -t eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
