@@ -32,10 +32,10 @@ jobs:
     - name: Build the Docker image
       run: docker build -t us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
     - name: Log in to Artifact Registry
-        uses: docker/login-action@v2
-        with:
-          registry: 'https://us-west2-docker.pkg.dev'
-          username: '_json_key'
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      uses: docker/login-action@v2
+      with:
+        registry: 'https://us-west2-docker.pkg.dev'
+        username: '_json_key'
+        password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Push the Docker image
       run: docker push us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister
