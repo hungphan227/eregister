@@ -30,4 +30,12 @@ jobs:
     - name: Build with Maven
       run: mvn clean package --file backend/spring-based/pom.xml
     - name: Build the Docker image
-      run: docker build -t eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
+      run: docker build -t us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
+    - name: Log in to Artifact Registry
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: 'https://us-west2-docker.pkg.dev'
+          username: '_json_key'
+          password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Push the Docker image
+      run: docker push us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister
