@@ -30,7 +30,7 @@ jobs:
     - name: Build with Maven
       run: mvn clean package --file backend/spring-based/pom.xml
     - name: Build the Docker image
-      run: docker build -t us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
+      run: docker build -t us-west2-docker.pkg.dev/prime-chess-368907/docker-repo/eregister --file backend/spring-based/docker/Dockerfile ./backend/spring-based/target
     - name: Log in to Artifact Registry
       uses: docker/login-action@v2
       with:
@@ -38,4 +38,4 @@ jobs:
         username: '_json_key'
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Push the Docker image
-      run: docker push us-west2-docker.pkg.dev/reliable-aloe-360309/repo-1/eregister
+      run: docker push us-west2-docker.pkg.dev/prime-chess-368907/docker-repo/eregister
