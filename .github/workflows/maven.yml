@@ -27,6 +27,18 @@ jobs:
         java-version: '8'
         distribution: 'temurin'
         cache: maven
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14.x'
+        cache: 'npm'
+    - name: Build frontend
+      run: |
+          cd frontend/react-based
+          npm i
+          npm run build
+    - name: Copy frontend files to backend folder
+      run: cp -R frontend/react-based/build backend/spring-based/src/main/resources/public
     - name: Build with Maven
       run: mvn clean package --file backend/spring-based/pom.xml
     - name: Build the Docker image
