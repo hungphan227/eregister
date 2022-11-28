@@ -32,6 +32,8 @@ jobs:
       with:
         node-version: '14.x'
     - name: Build frontend
+      env:
+         CI: ""
       run: |
           cd frontend/react-based
           npm i
