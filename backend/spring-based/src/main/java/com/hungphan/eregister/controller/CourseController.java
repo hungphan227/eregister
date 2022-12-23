@@ -5,14 +5,12 @@ import java.util.List;
 import akka.actor.ActorRef;
 import akka.routing.ConsistentHashingRouter;
 
+import com.hungphan.eregister.dto.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import com.hungphan.eregister.Constants;
@@ -57,11 +55,16 @@ public class CourseController {
     }
 
     @PutMapping("/join-course/{courseId}")
-    DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId) {
+    DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
         DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
-        String studentNumber = Utils.getCurrentUser();
-        ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
-        courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentNumber, result), courseId), ActorRef.noSender());
+        try {
+            Jwt jwt = Utils.decodeJwt(token);
+            String studentNumber = jwt.getSub();
+            ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
+            courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentNumber, result), courseId), ActorRef.noSender());
+        } catch (Exception exception) {
+            result.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseMessage("Unknown error")));
+        }
         return result;
     }
 

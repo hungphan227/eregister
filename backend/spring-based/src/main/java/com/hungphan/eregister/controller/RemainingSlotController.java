@@ -45,7 +45,7 @@ public class RemainingSlotController extends AbstractVerticle {
 //        httpServer.requestHandler(router).listen(9997);
 
         Router router = Router.router(vertx);
-        router.mountSubRouter("/eregister/websocket", eventBusHandler());
+        router.mountSubRouter("/eregister-service/websocket", eventBusHandler());
 
         vertx.createHttpServer()
                 .requestHandler(router)
