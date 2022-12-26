@@ -13,15 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.hungphan.eregister.Application;
 import com.hungphan.eregister.dto.CourseDto;
 import com.hungphan.eregister.dto.CourseStatusDto;
 import com.hungphan.eregister.model.Course;
-import com.hungphan.eregister.model.Student;
 import com.hungphan.eregister.model.StudentCourseRelation;
 import com.hungphan.eregister.repository.CourseRepository;
 import com.hungphan.eregister.repository.StudentCourseRelationRepository;
-import com.hungphan.eregister.repository.StudentRepository;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -35,9 +32,6 @@ public class CourseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseService.class);
     
     @Autowired
-    private StudentRepository studentRepository;
-    
-    @Autowired
     private CourseRepository courseRepository;
     
     @Autowired
@@ -47,14 +41,13 @@ public class CourseService {
     private RestClient elasticClient;
     
     @Transactional(rollbackOn={Exception.class})
-    public CourseDto joinCourse(Long courseId, String studentNumber) {
+    public CourseDto joinCourse(Long courseId, String studentId) {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
         Course course = courseRepository.findById(courseId).get();
         int remainingSlots = course.getLimit() - numberOfStudentsInTheCourse;
         if (remainingSlots > 0) {
-            Student student = studentRepository.findByStudentNumber(studentNumber);
-            studentCourseRelationRepository.save(new StudentCourseRelation(student.getId(), courseId));
-            LOGGER.info("Save new StudentCourseRelation student {} course {} into database", student.getStudentNumber(), course.getCourseNumber());
+            studentCourseRelationRepository.save(new StudentCourseRelation(studentId, courseId));
+            LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
             return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getLimit(),course.getTeacher(),course.getDescription(),remainingSlots - 1);
         }
         return null;

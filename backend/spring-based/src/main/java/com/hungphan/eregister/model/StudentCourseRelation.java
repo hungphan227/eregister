@@ -19,14 +19,14 @@ public class StudentCourseRelation {
     @SequenceGenerator(name = "StudentCourseRelation_GEN", sequenceName = "StudentCourseRelation_SEQ", allocationSize = 1)
     private Long id;
 
-    private Long studentId;
+    private String studentId;
     private Long courseId;
     
     public StudentCourseRelation() {
         super();
     }
 
-    public StudentCourseRelation(Long studentId, Long courseId) {
+    public StudentCourseRelation(String studentId, Long courseId) {
         super();
         this.studentId = studentId;
         this.courseId = courseId;
@@ -40,11 +40,11 @@ public class StudentCourseRelation {
         this.id = id;
     }
 
-    public Long getStudentId() {
+    public String getStudentId() {
         return studentId;
     }
 
-    public void setStudentId(Long studentId) {
+    public void setStudentId(String studentId) {
         this.studentId = studentId;
     }
 

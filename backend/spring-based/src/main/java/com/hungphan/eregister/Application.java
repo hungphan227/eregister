@@ -2,18 +2,22 @@ package com.hungphan.eregister;
 
 import javax.annotation.PostConstruct;
 
+import com.hungphan.eregister.model.Course;
+import com.hungphan.eregister.repository.CourseRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import com.hungphan.eregister.actor.ActorSystemSingleton;
 import com.hungphan.eregister.actor.CourseActor;
 import com.hungphan.eregister.config.SpringExtension;
-import com.hungphan.eregister.controller.RedisMessageListener;
 import com.hungphan.eregister.controller.RemainingSlotController;
 
 import akka.actor.ActorSystem;
@@ -50,21 +54,17 @@ public class Application {
 //        System.out.println("Value of key loda: " + redisTemplate.opsForValue().get("loda"));
     }
     
-//    @Profile("first")
-//    @Bean
-//    CommandLineRunner initDatabase(StudentRepository studentRepository, CourseRepository courseRepository) {
-//        return args -> {
-//            studentRepository.save(new Student("harry", "1", "Harry Potter", 20));
-//            studentRepository.save(new Student("peter", "1", "Peter Pevensia", 22));
-//            studentRepository.save(new Student("gandalf", "1", "Gandalf The White", 100));
-//            
-//            courseRepository.save(new Course("magic", "Magic", 1));
-//            courseRepository.save(new Course("sword", "Sword", 2));
-//            courseRepository.save(new Course("archery", "Archery", 3));
-//            courseRepository.save(new Course("strategy", "Strategy", 4));
-//            courseRepository.save(new Course("leadership", "Leadership", 5));
-//            courseRepository.save(new Course("transformation", "Transformation", 6));
-//        };
-//    }
+    @Profile("init")
+    @Bean
+    CommandLineRunner initDatabase(CourseRepository courseRepository) {
+        return args -> {
+            courseRepository.save(new Course("DSA", "Data Structure and Algorithms", 6));
+            courseRepository.save(new Course("OOP", "Object Oriented Programming", 4));
+            courseRepository.save(new Course("Database", "Database Systems", 5));
+            courseRepository.save(new Course("OS", "Operating System", 3));
+            courseRepository.save(new Course("Network", "Computer Network", 1));
+            courseRepository.save(new Course("CA", "Computer Architecture", 2));
+        };
+    }
     
 }

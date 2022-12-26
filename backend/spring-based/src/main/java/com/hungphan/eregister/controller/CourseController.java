@@ -59,9 +59,9 @@ public class CourseController {
         DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
         try {
             Jwt jwt = Utils.decodeJwt(token);
-            String studentNumber = jwt.getSub();
+            String studentId = jwt.getSub();
             ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
-            courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentNumber, result), courseId), ActorRef.noSender());
+            courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentId, result), courseId), ActorRef.noSender());
         } catch (Exception exception) {
             result.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseMessage("Unknown error")));
         }
