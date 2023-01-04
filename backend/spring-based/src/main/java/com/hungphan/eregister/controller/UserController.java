@@ -22,11 +22,13 @@ public class UserController {
     
     @GetMapping("/check-authentication")
     private boolean isAuthenticated() {
+        LOGGER.info("start searchCourses method with searchString");
         return true;
     }
     
     @GetMapping("/get-client-session-id")
     private void getClientSessionId(HttpServletRequest request, HttpServletResponse response) {
+        LOGGER.info("start getClientSessionId method");
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {

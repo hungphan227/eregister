@@ -6,6 +6,8 @@ import akka.actor.ActorRef;
 import akka.routing.ConsistentHashingRouter;
 
 import com.hungphan.eregister.dto.Jwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ import com.hungphan.eregister.service.CourseService;
 @RestController
 public class CourseController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
+
     @Autowired
     private CourseService courseService;
 
@@ -35,16 +39,19 @@ public class CourseController {
 
     @GetMapping("/courses")
     List<CourseDto> getAll() {
+        LOGGER.info("start getAll method");
         return courseService.getAllCoursesWithRemainingSlots();
     }
     
     @GetMapping("/course/{courseId}")
     CourseDto getCourse(@PathVariable Long courseId) {
+        LOGGER.info("start getCourse method with courseId {}", courseId);
         return courseService.getCourseWithRemainingSlots(courseId);
     }
 
     @GetMapping("/course/search/{searchString}")
     ResponseEntity<List<CourseDto>> searchCourses(@PathVariable String searchString) {
+        LOGGER.info("start searchCourses method with searchString {}", searchString);
         List<CourseDto> list = null;
         try {
             list = courseService.searchCourses(searchString);
@@ -56,6 +63,7 @@ public class CourseController {
 
     @PutMapping("/join-course/{courseId}")
     DeferredResult<ResponseEntity<HttpResponseMessage>> joinCourse(@PathVariable Long courseId, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        LOGGER.info("start joinCourse method with courseId {}, token {}", courseId, token);
         DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
         try {
             Jwt jwt = Utils.decodeJwt(token);
