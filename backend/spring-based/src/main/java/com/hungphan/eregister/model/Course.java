@@ -30,11 +30,12 @@ public class Course {
         super();
     }
 
-    public Course(String courseNumber, String courseName, Integer limit) {
+    public Course(String courseNumber, String courseName, Integer limit, String teacher) {
         super();
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.courseLimit = limit;
+        this.teacher = teacher;
     }
 
     public Long getId() {

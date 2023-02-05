@@ -58,12 +58,27 @@ public class Application {
     @Bean
     CommandLineRunner initDatabase(CourseRepository courseRepository) {
         return args -> {
-            courseRepository.save(new Course("DSA", "Data Structure and Algorithms", 6));
-            courseRepository.save(new Course("OOP", "Object Oriented Programming", 4));
-            courseRepository.save(new Course("Database", "Database Systems", 5));
-            courseRepository.save(new Course("OS", "Operating System", 3));
-            courseRepository.save(new Course("Network", "Computer Network", 1));
-            courseRepository.save(new Course("CA", "Computer Architecture", 2));
+            courseRepository.deleteAll();
+            courseRepository.save(new Course("DSA", "Data Structure and Algorithms", 6, "Edsger Dijkstra"));
+            courseRepository.save(new Course("OOP", "Object Oriented Programming", 4, "James Gosling"));
+            courseRepository.save(new Course("Database", "Database Systems", 5, "Edgar Codd"));
+            courseRepository.save(new Course("OS", "Operating System", 3, "Linux Torvard"));
+            courseRepository.save(new Course("Network", "Computer Network", 1, "Tim Berners-Lee"));
+            courseRepository.save(new Course("CA", "Computer Architecture", 2, "Alan Turing"));
+        };
+    }
+
+    @Profile("stress-test")
+    @Bean
+    CommandLineRunner initDatabase2(CourseRepository courseRepository) {
+        return args -> {
+            courseRepository.deleteAll();
+            courseRepository.save(new Course("DSA", "Data Structure and Algorithms", 60, "Edsger Dijkstra"));
+            courseRepository.save(new Course("OOP", "Object Oriented Programming", 40, "James Gosling"));
+            courseRepository.save(new Course("Database", "Database Systems", 50, "Edgar Codd"));
+            courseRepository.save(new Course("OS", "Operating System", 30, "Linux Torvard"));
+            courseRepository.save(new Course("Network", "Computer Network", 10, "Tim Berners-Lee"));
+            courseRepository.save(new Course("CA", "Computer Architecture", 20, "Alan Turing"));
         };
     }
     
