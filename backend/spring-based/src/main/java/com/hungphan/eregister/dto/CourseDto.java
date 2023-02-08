@@ -1,5 +1,10 @@
 package com.hungphan.eregister.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class CourseDto {
 
     private Long id;
@@ -11,19 +16,22 @@ public class CourseDto {
     private String teacher;
     private String description;
 
+    private String image;
+
     public CourseDto() {
     }
 
-    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description) {
+    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description, String image) {
         this.id = id;
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.limit = limit;
         this.teacher = teacher;
         this.description = description;
+        this.image = image;
     }
 
-    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description, Integer remainingSlots) {
+    public CourseDto(Long id, String courseNumber, String courseName, Integer limit, String teacher, String description, Integer remainingSlots, String image) {
         this.id = id;
         this.courseNumber = courseNumber;
         this.courseName = courseName;
@@ -31,62 +39,7 @@ public class CourseDto {
         this.teacher = teacher;
         this.description = description;
         this.remainingSlots = remainingSlots;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCourseNumber() {
-        return courseNumber;
-    }
-
-    public void setCourseNumber(String courseNumber) {
-        this.courseNumber = courseNumber;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.limit = limit;
-    }
-
-    public Integer getRemainingSlots() {
-        return remainingSlots;
-    }
-
-    public void setRemainingSlots(Integer remainingSlots) {
-        this.remainingSlots = remainingSlots;
-    }
-
-    public String getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(String teacher) {
-        this.teacher = teacher;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+        this.image = image;
     }
     
 }

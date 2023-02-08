@@ -48,7 +48,8 @@ public class CourseService {
         if (remainingSlots > 0) {
             studentCourseRelationRepository.save(new StudentCourseRelation(studentId, courseId));
             LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
-            return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getCourseLimit(),course.getTeacher(),course.getDescription(),remainingSlots - 1);
+            return new CourseDto(course.getId(), course.getCourseNumber(), course.getCourseName(), course.getCourseLimit(),
+                    course.getTeacher(),course.getDescription(),remainingSlots - 1, course.getImage());
         }
         return null;
     }
@@ -69,7 +70,8 @@ public class CourseService {
 
         List<CourseDto> courseDtos = new ArrayList<>();
         for(Course course : courses) {
-            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(),course.getCourseLimit(),course.getTeacher(),course.getDescription());
+            CourseDto courseDto = new CourseDto(course.getId(), course.getCourseNumber(), course.getCourseName(), course.getCourseLimit(),
+                    course.getTeacher(), course.getDescription(), course.getImage());
             Integer remainingSlots = mapCourseId2Students.get(course.getId())!=null?mapCourseId2Students.get(course.getId()):0;
             courseDto.setRemainingSlots(course.getCourseLimit() - remainingSlots);
             courseDtos.add(courseDto);
@@ -81,7 +83,8 @@ public class CourseService {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
         Course course = courseRepository.findById(courseId).get();
         int remainingSlots = course.getCourseLimit() - numberOfStudentsInTheCourse;
-        return new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(), course.getCourseLimit(),course.getTeacher(),course.getDescription(),remainingSlots);
+        return new CourseDto(course.getId(), course.getCourseNumber(), course.getCourseName(), course.getCourseLimit(),
+                course.getTeacher(), course.getDescription(), remainingSlots, course.getImage());
     }
 
     public List<CourseDto> searchCourses(String searchString) throws Exception {
@@ -91,7 +94,8 @@ public class CourseService {
         Map<Long, Integer> mapCourseId2Students = listCourseStatusDto.stream().collect(Collectors.toMap(CourseStatusDto::getCourseId, CourseStatusDto::getNumberOfStudents));
         List<CourseDto> listCourseDto = new ArrayList<>();
         for(Course course : courses) {
-            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(),course.getCourseName(),course.getCourseLimit(),course.getTeacher(),course.getDescription());
+            CourseDto courseDto = new CourseDto(course.getId(),course.getCourseNumber(), course.getCourseName(), course.getCourseLimit(),
+                    course.getTeacher(), course.getDescription(), course.getImage());
             Integer remainingSlots = mapCourseId2Students.get(course.getId())!=null?mapCourseId2Students.get(course.getId()):0;
             courseDto.setRemainingSlots(course.getCourseLimit() - remainingSlots);
             listCourseDto.add(courseDto);

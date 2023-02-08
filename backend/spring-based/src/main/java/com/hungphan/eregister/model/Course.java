@@ -30,17 +30,20 @@ public class Course {
     
     @Column(length = 1000)
     private String description;
+
+    private String image;
     
     public Course() {
         super();
     }
 
-    public Course(String courseNumber, String courseName, Integer limit, String teacher) {
+    public Course(String courseNumber, String courseName, Integer limit, String teacher, String image) {
         super();
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.courseLimit = limit;
         this.teacher = teacher;
+        this.image = image;
     }
     
 }
