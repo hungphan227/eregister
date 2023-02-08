@@ -26,6 +26,8 @@ import com.hungphan.eregister.model.Course;
 import com.hungphan.eregister.repository.CourseRepository;
 import com.hungphan.eregister.service.CourseService;
 
+import javax.ws.rs.QueryParam;
+
 @RestController
 public class CourseController {
 
@@ -56,7 +58,23 @@ public class CourseController {
         try {
             list = courseService.searchCourses(searchString);
         } catch (Exception exception) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(list);
+            LOGGER.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    @GetMapping("/course/get-courses-of-student")
+    ResponseEntity<List<Course>> getCoursesOfStudent(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        LOGGER.info("start getCoursesOfStudent method");
+        List<Course> list = null;
+        try {
+            Jwt jwt = Utils.decodeJwt(token);
+            String username = jwt.getSub();
+            list = courseRepository.getCoursesByStudentId(username);
+        } catch (Exception exception) {
+            LOGGER.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
@@ -67,13 +85,28 @@ public class CourseController {
         DeferredResult<ResponseEntity<HttpResponseMessage>> result = new DeferredResult<>();
         try {
             Jwt jwt = Utils.decodeJwt(token);
-            String studentId = jwt.getSub();
+            String username = jwt.getSub();
             ActorRef courseActor = ActorSystemSingleton.getInstance().actorFor(Constants.GUARDIAN_ACTOR_NAME + CourseActor.class.getSimpleName());
-            courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, studentId, result), courseId), ActorRef.noSender());
+            courseActor.tell(new ConsistentHashingRouter.ConsistentHashableEnvelope(new CourseMessage(courseId, username, result), courseId), ActorRef.noSender());
         } catch (Exception exception) {
+            LOGGER.error(exception.getMessage());
             result.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseMessage("Unknown error")));
         }
         return result;
+    }
+
+    @DeleteMapping("/course/cancel/{courseId}")
+    ResponseEntity<HttpResponseMessage> cancelCourseRegistration(@PathVariable(value = "courseId") Long courseId, @RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+        LOGGER.info("start cancelCourseRegistration method with courseId {} and token {}", courseId, token);
+        try {
+            Jwt jwt = Utils.decodeJwt(token);
+            String username = jwt.getSub();
+            if (courseService.cancelCourseRegistration(courseId, username)) return ResponseEntity.status(HttpStatus.OK).body(new HttpResponseMessage("Succeed"));
+        } catch (Exception exception) {
+            LOGGER.error(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseMessage("Unknown error"));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponseMessage("Fail"));
     }
 
 }

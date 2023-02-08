@@ -1,5 +1,8 @@
 package com.hungphan.eregister.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +12,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "StudentCourseRelation", uniqueConstraints = @UniqueConstraint(columnNames = { "studentId", "courseId" }))
 public class StudentCourseRelation {
@@ -21,6 +26,7 @@ public class StudentCourseRelation {
 
     private String studentId;
     private Long courseId;
+    private Boolean cancelled;
     
     public StudentCourseRelation() {
         super();
@@ -30,30 +36,7 @@ public class StudentCourseRelation {
         super();
         this.studentId = studentId;
         this.courseId = courseId;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getStudentId() {
-        return studentId;
-    }
-
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-    }
-
-    public Long getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(Long courseId) {
-        this.courseId = courseId;
+        this.cancelled = false;
     }
 
 }

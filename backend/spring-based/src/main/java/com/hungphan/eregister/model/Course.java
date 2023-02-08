@@ -1,5 +1,8 @@
 package com.hungphan.eregister.model;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,6 +12,8 @@ import javax.persistence.SequenceGenerator;
 
 import java.math.BigDecimal;
 
+@Getter
+@Setter
 @Entity
 public class Course {
 
@@ -36,54 +41,6 @@ public class Course {
         this.courseName = courseName;
         this.courseLimit = limit;
         this.teacher = teacher;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getCourseNumber() {
-        return courseNumber;
-    }
-
-    public void setCourseNumber(String courseNumber) {
-        this.courseNumber = courseNumber;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
-    public Integer getLimit() {
-        return courseLimit;
-    }
-
-    public void setLimit(Integer limit) {
-        this.courseLimit = limit;
-    }
-
-    public String getTeacher() {
-        return teacher;
-    }
-
-    public void setTeacher(String teacher) {
-        this.teacher = teacher;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
     
 }
