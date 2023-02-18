@@ -27,6 +27,7 @@ public class Course {
     private String courseName;
     private Integer courseLimit;
     private String teacher;
+    private Long price;
     
     @Column(length = 1000)
     private String description;
@@ -37,12 +38,13 @@ public class Course {
         super();
     }
 
-    public Course(String courseNumber, String courseName, Integer limit, String teacher, String image) {
+    public Course(String courseNumber, String courseName, Integer limit, String teacher, Long price, String image) {
         super();
         this.courseNumber = courseNumber;
         this.courseName = courseName;
         this.courseLimit = limit;
         this.teacher = teacher;
+        this.price = price;
         this.image = image;
     }
     

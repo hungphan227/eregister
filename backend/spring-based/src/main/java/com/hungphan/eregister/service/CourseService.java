@@ -2,6 +2,9 @@ package com.hungphan.eregister.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hungphan.eregister.dto.HoldingCreditRequestDto;
+import com.hungphan.eregister.dto.HoldingCreditResponseDto;
+import com.hungphan.eregister.restclient.UserService;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
 import org.apache.http.util.EntityUtils;
@@ -19,6 +22,8 @@ import com.hungphan.eregister.model.Course;
 import com.hungphan.eregister.model.StudentCourseRelation;
 import com.hungphan.eregister.repository.CourseRepository;
 import com.hungphan.eregister.repository.StudentCourseRelationRepository;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -38,8 +43,11 @@ public class CourseService {
     private StudentCourseRelationRepository studentCourseRelationRepository;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private RestClient elasticClient;
-    
+
     @Transactional(rollbackOn={Exception.class})
     public CourseDto joinCourse(Long courseId, String studentId) {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
@@ -48,6 +56,20 @@ public class CourseService {
         if (remainingSlots > 0) {
             studentCourseRelationRepository.save(new StudentCourseRelation(studentId, courseId));
             LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
+
+            HoldingCreditResponseDto holdingCreditResponseDto = userService.holdCredit(new HoldingCreditRequestDto(course.getPrice(), studentId, "Register a course"));
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                public void afterCompletion(int status){
+                    if (TransactionSynchronization.STATUS_COMMITTED == status) {
+                        userService.useCredit(holdingCreditResponseDto.getTransactionId());
+                        return;
+                    }
+                    if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
+                        userService.releaseCredit(holdingCreditResponseDto.getTransactionId());
+                    }
+                }
+            });
+
             return new CourseDto(course.getId(), course.getCourseNumber(), course.getCourseName(), course.getCourseLimit(),
                     course.getTeacher(),course.getDescription(),remainingSlots - 1, course.getImage());
         }
