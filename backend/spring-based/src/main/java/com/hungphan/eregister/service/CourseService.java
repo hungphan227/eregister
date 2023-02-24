@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hungphan.eregister.dto.HoldingCreditRequestDto;
 import com.hungphan.eregister.dto.HoldingCreditResponseDto;
+import com.hungphan.eregister.model.PendingRestApiCallCouple;
+import com.hungphan.eregister.repository.PendingRestApiCallCoupleRepository;
 import com.hungphan.eregister.restclient.UserService;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
@@ -22,13 +24,15 @@ import com.hungphan.eregister.model.Course;
 import com.hungphan.eregister.model.StudentCourseRelation;
 import com.hungphan.eregister.repository.CourseRepository;
 import com.hungphan.eregister.repository.StudentCourseRelationRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -43,12 +47,15 @@ public class CourseService {
     private StudentCourseRelationRepository studentCourseRelationRepository;
 
     @Autowired
+    private PendingRestApiCallCoupleRepository pendingRestApiCallCoupleRepository;
+
+    @Autowired
     private UserService userService;
 
     @Autowired
     private RestClient elasticClient;
 
-    @Transactional(rollbackOn={Exception.class})
+    @Transactional
     public CourseDto joinCourse(Long courseId, String studentId) {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
         Course course = courseRepository.findById(courseId).get();
@@ -57,15 +64,23 @@ public class CourseService {
             studentCourseRelationRepository.save(new StudentCourseRelation(studentId, courseId));
             LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
 
-            HoldingCreditResponseDto holdingCreditResponseDto = userService.holdCredit(new HoldingCreditRequestDto(course.getPrice(), studentId, "Register a course"));
+            String requestId = UUID.randomUUID().toString();
+            HoldingCreditResponseDto holdingCreditResponseDto = holdCredit(requestId, studentId, course.getPrice());
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 public void afterCompletion(int status){
+                    PendingRestApiCallCouple pendingRestApiCallCouple = pendingRestApiCallCoupleRepository.findByRequestId(requestId);
                     if (TransactionSynchronization.STATUS_COMMITTED == status) {
-                        userService.useCredit(holdingCreditResponseDto.getTransactionId());
+                        pendingRestApiCallCouple.setSecondMethodName("useCredit");
+                        pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
+                        userService.useCredit(requestId);
+                        pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
                         return;
                     }
                     if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
-                        userService.releaseCredit(holdingCreditResponseDto.getTransactionId());
+                        pendingRestApiCallCouple.setSecondMethodName("releaseCredit");
+                        pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
+                        userService.releaseCredit(requestId);
+                        pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
                     }
                 }
             });
@@ -74,6 +89,12 @@ public class CourseService {
                     course.getTeacher(),course.getDescription(),remainingSlots - 1, course.getImage());
         }
         return null;
+    }
+
+    @Transactional(propagation= Propagation.REQUIRES_NEW)
+    private HoldingCreditResponseDto holdCredit(String requestId, String studentId, Long price) {
+        pendingRestApiCallCoupleRepository.save(PendingRestApiCallCouple.builder().requestId(requestId).className("userService").firstMethodName("holdCredit").build());
+        return userService.holdCredit(new HoldingCreditRequestDto(requestId, price, studentId, "Register a course"));
     }
 
     @Transactional

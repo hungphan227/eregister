@@ -14,10 +14,10 @@ public interface UserService {
     @RequestMapping(method = RequestMethod.POST, value = "/user/balance/hold-credit")
     HoldingCreditResponseDto holdCredit(@RequestBody HoldingCreditRequestDto holdingCreditRequestDto);
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/user/balance/use-credit/{transactionId}")
-    void useCredit(@PathVariable Long transactionId);
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/balance/use-credit/{requestId}")
+    void useCredit(@PathVariable String requestId);
 
-    @RequestMapping(method = RequestMethod.PUT, value = "/user/balance/release-credit/{transactionId}")
-    void releaseCredit(@PathVariable Long transactionId);
+    @RequestMapping(method = RequestMethod.PUT, value = "/user/balance/release-credit/{requestId}")
+    void releaseCredit(@PathVariable String requestId);
 
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class HoldingCreditRequestDto {
 
+    private String requestId;
     private Long creditAmount;
     private String username;
     private String description;
