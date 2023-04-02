@@ -24,9 +24,11 @@ import com.hungphan.eregister.controller.RemainingSlotController;
 import akka.actor.ActorSystem;
 import akka.routing.ConsistentHashingPool;
 import io.vertx.core.Vertx;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableFeignClients
+@EnableScheduling
 public class Application {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
