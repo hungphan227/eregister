@@ -1,6 +1,7 @@
 package com.hungphan.eregister.model;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -14,8 +15,9 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-public class Course {
+public class Course extends BasicEntity {
 
     @Id
     @Column(name = "ID")
@@ -33,10 +35,6 @@ public class Course {
     private String description;
 
     private String image;
-    
-    public Course() {
-        super();
-    }
 
     public Course(String courseNumber, String courseName, Integer limit, String teacher, Long price, String image) {
         super();

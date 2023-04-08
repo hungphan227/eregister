@@ -10,7 +10,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Entity
-public class PendingRestApiCallCouple {
+public class PendingRestApiCallCouple extends BasicEntity {
 
     @Id
     @Column(name = "ID")

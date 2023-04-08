@@ -60,8 +60,10 @@ public class CourseActor extends AbstractActor {
                     result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponseMessage("Over limit!")));
                 }
             } catch (DataIntegrityViolationException exception) {
+                LOGGER.error(exception.toString());
                 result.setResult(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new HttpResponseMessage("You has already registered")));
             } catch (Exception exception) {
+                LOGGER.error(exception.toString());
                 result.setResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new HttpResponseMessage("Unknown error")));
             }
         }).build();

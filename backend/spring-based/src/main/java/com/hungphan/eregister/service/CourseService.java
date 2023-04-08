@@ -24,11 +24,18 @@ import com.hungphan.eregister.model.Course;
 import com.hungphan.eregister.model.StudentCourseRelation;
 import com.hungphan.eregister.repository.CourseRepository;
 import com.hungphan.eregister.repository.StudentCourseRelationRepository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
+import org.springframework.transaction.support.*;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +62,13 @@ public class CourseService {
     @Autowired
     private RestClient elasticClient;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private EntityManagerFactory emf;
+
+
     @Transactional
     public CourseDto joinCourse(Long courseId, String studentId) {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
@@ -65,18 +79,34 @@ public class CourseService {
             LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
 
             String requestId = UUID.randomUUID().toString();
-            HoldingCreditResponseDto holdingCreditResponseDto = holdCredit(requestId, studentId, course.getPrice());
+            savePendingRestApiCallCouple(requestId, studentId, course.getPrice());
+            userService.holdCredit(new HoldingCreditRequestDto(requestId, course.getPrice(), studentId, "Register a course"));
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 public void afterCompletion(int status){
-                    PendingRestApiCallCouple pendingRestApiCallCouple = pendingRestApiCallCoupleRepository.findByRequestId(requestId);
+                    TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
                     if (TransactionSynchronization.STATUS_COMMITTED == status) {
+                        EntityManager em = emf.createEntityManager();
+                        EntityTransaction tx = em.getTransaction();
+                        tx.begin();
+                        PendingRestApiCallCouple pendingRestApiCallCouple = em.createQuery("from PendingRestApiCallCouple where requestId=:requestId", PendingRestApiCallCouple.class)
+                                .setParameter("requestId", requestId).getSingleResult();
                         pendingRestApiCallCouple.setSecondMethodName("useCredit");
-                        pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
+                        em.persist(pendingRestApiCallCouple);
+                        tx.commit();
+
                         userService.useCredit(requestId);
-                        pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
+
+                        tx = em.getTransaction();
+                        tx.begin();
+                        pendingRestApiCallCouple = em.createQuery("from PendingRestApiCallCouple where requestId=:requestId", PendingRestApiCallCouple.class)
+                                .setParameter("requestId", requestId).getSingleResult();
+                        em.remove(pendingRestApiCallCouple);
+                        tx.commit();
+                        em.close();
                         return;
                     }
                     if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
+                        PendingRestApiCallCouple pendingRestApiCallCouple = pendingRestApiCallCoupleRepository.findByRequestId(requestId);
                         pendingRestApiCallCouple.setSecondMethodName("releaseCredit");
                         pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
                         userService.releaseCredit(requestId);
@@ -91,10 +121,29 @@ public class CourseService {
         return null;
     }
 
-    @Transactional(propagation= Propagation.REQUIRES_NEW)
-    private HoldingCreditResponseDto holdCredit(String requestId, String studentId, Long price) {
+//    @Transactional(propagation=Propagation.REQUIRES_NEW)
+    private void savePendingRestApiCallCouple(String requestId, String studentId, Long price) {
         pendingRestApiCallCoupleRepository.save(PendingRestApiCallCouple.builder().requestId(requestId).className("userService").firstMethodName("holdCredit").build());
-        return userService.holdCredit(new HoldingCreditRequestDto(requestId, price, studentId, "Register a course"));
+    }
+
+    @Transactional
+    public void checkPendingRestApiCalls() {
+        List<PendingRestApiCallCouple> pendingRestApiCallCouples = pendingRestApiCallCoupleRepository.findAll();
+        for (PendingRestApiCallCouple pendingRestApiCallCouple : pendingRestApiCallCouples) {
+            Instant currentTime = Instant.now();
+            currentTime.minus(15, ChronoUnit.MINUTES);
+            if (pendingRestApiCallCouple.getCreatedTime().compareTo(currentTime)>=0) continue;
+            if ("useCredit".equals(pendingRestApiCallCouple.getSecondMethodName())) {
+                userService.useCredit(pendingRestApiCallCouple.getRequestId());
+                pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
+                continue;
+            }
+            if ("releaseCredit".equals(pendingRestApiCallCouple.getSecondMethodName())) {
+                userService.releaseCredit(pendingRestApiCallCouple.getRequestId());
+                pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
+                continue;
+            }
+        }
     }
 
     @Transactional
