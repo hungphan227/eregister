@@ -60,6 +60,9 @@ public class CourseService {
     private UserService userService;
 
     @Autowired
+    private PendingRestApiCallCoupleService pendingRestApiCallCoupleService;
+
+    @Autowired
     private RestClient elasticClient;
 
     @Autowired
@@ -68,49 +71,33 @@ public class CourseService {
     @Autowired
     private EntityManagerFactory emf;
 
-
     @Transactional
     public CourseDto joinCourse(Long courseId, String studentId) {
         int numberOfStudentsInTheCourse = studentCourseRelationRepository.countNumberOfStudentInOneCourse(courseId);
         Course course = courseRepository.findById(courseId).get();
         int remainingSlots = course.getCourseLimit() - numberOfStudentsInTheCourse;
         if (remainingSlots > 0) {
+            String requestId = UUID.randomUUID().toString();
+            pendingRestApiCallCoupleService.createPendingRestApiCallCoupleThenCommit(PendingRestApiCallCouple.builder()
+                    .requestId(requestId).className("userService").firstMethodName("holdCredit").build());
             studentCourseRelationRepository.save(new StudentCourseRelation(studentId, courseId));
             LOGGER.info("Save new StudentCourseRelation student {} course {} into database", studentId, course.getCourseNumber());
 
-            String requestId = UUID.randomUUID().toString();
-            savePendingRestApiCallCouple(requestId, studentId, course.getPrice());
             userService.holdCredit(new HoldingCreditRequestDto(requestId, course.getPrice(), studentId, "Register a course"));
+            PendingRestApiCallCouple pendingRestApiCallCouple = pendingRestApiCallCoupleRepository.findByRequestId(requestId);
+            pendingRestApiCallCouple.setSecondMethodName("useCredit");
+            pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 public void afterCompletion(int status){
-                    TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
                     if (TransactionSynchronization.STATUS_COMMITTED == status) {
-                        EntityManager em = emf.createEntityManager();
-                        EntityTransaction tx = em.getTransaction();
-                        tx.begin();
-                        PendingRestApiCallCouple pendingRestApiCallCouple = em.createQuery("from PendingRestApiCallCouple where requestId=:requestId", PendingRestApiCallCouple.class)
-                                .setParameter("requestId", requestId).getSingleResult();
-                        pendingRestApiCallCouple.setSecondMethodName("useCredit");
-                        em.persist(pendingRestApiCallCouple);
-                        tx.commit();
-
                         userService.useCredit(requestId);
-
-                        tx = em.getTransaction();
-                        tx.begin();
-                        pendingRestApiCallCouple = em.createQuery("from PendingRestApiCallCouple where requestId=:requestId", PendingRestApiCallCouple.class)
-                                .setParameter("requestId", requestId).getSingleResult();
-                        em.remove(pendingRestApiCallCouple);
-                        tx.commit();
-                        em.close();
+                        pendingRestApiCallCoupleService.deletePendingRestApiCallCoupleThenCommit(requestId);
                         return;
                     }
                     if (TransactionSynchronization.STATUS_ROLLED_BACK == status) {
-                        PendingRestApiCallCouple pendingRestApiCallCouple = pendingRestApiCallCoupleRepository.findByRequestId(requestId);
-                        pendingRestApiCallCouple.setSecondMethodName("releaseCredit");
-                        pendingRestApiCallCoupleRepository.save(pendingRestApiCallCouple);
+                        pendingRestApiCallCoupleService.updateSecondMethodNameOfPendingRestApiCallCoupleThenCommit(requestId, "releaseCredit");
                         userService.releaseCredit(requestId);
-                        pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
+                        pendingRestApiCallCoupleService.deletePendingRestApiCallCoupleThenCommit(requestId);
                     }
                 }
             });
@@ -121,24 +108,18 @@ public class CourseService {
         return null;
     }
 
-//    @Transactional(propagation=Propagation.REQUIRES_NEW)
-    private void savePendingRestApiCallCouple(String requestId, String studentId, Long price) {
-        pendingRestApiCallCoupleRepository.save(PendingRestApiCallCouple.builder().requestId(requestId).className("userService").firstMethodName("holdCredit").build());
-    }
-
-    @Transactional
     public void checkPendingRestApiCalls() {
         List<PendingRestApiCallCouple> pendingRestApiCallCouples = pendingRestApiCallCoupleRepository.findAll();
         for (PendingRestApiCallCouple pendingRestApiCallCouple : pendingRestApiCallCouples) {
             Instant currentTime = Instant.now();
-            currentTime.minus(15, ChronoUnit.MINUTES);
+            currentTime = currentTime.minus(15, ChronoUnit.MINUTES);
             if (pendingRestApiCallCouple.getCreatedTime().compareTo(currentTime)>=0) continue;
             if ("useCredit".equals(pendingRestApiCallCouple.getSecondMethodName())) {
                 userService.useCredit(pendingRestApiCallCouple.getRequestId());
                 pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
                 continue;
             }
-            if ("releaseCredit".equals(pendingRestApiCallCouple.getSecondMethodName())) {
+            if (pendingRestApiCallCouple.getSecondMethodName() == null || "releaseCredit".equals(pendingRestApiCallCouple.getSecondMethodName())) {
                 userService.releaseCredit(pendingRestApiCallCouple.getRequestId());
                 pendingRestApiCallCoupleRepository.delete(pendingRestApiCallCouple);
                 continue;

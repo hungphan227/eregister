@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class ScheduledTasks {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTasks.class);
@@ -15,7 +15,7 @@ public class ScheduledTasks {
     @Autowired
     private CourseService courseService;
 
-    @Scheduled(fixedDelay = 60*1000)
+    @Scheduled(fixedDelay = 60*30000)
     public void scheduleTaskWithFixedRate() {
         LOGGER.info("check Pending RestApi Calls");
         courseService.checkPendingRestApiCalls();

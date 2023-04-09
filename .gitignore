@@ -41,3 +41,5 @@ nb-configuration.xml
 
 backend/spring-based/src/main/resources/public/
 .eslintcache
+*.mv.db
+*.trace.db
