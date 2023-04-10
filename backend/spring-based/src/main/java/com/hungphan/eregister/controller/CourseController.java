@@ -65,17 +65,12 @@ public class CourseController {
     }
 
     @GetMapping("/course/get-courses-of-student")
-    ResponseEntity<List<Course>> getCoursesOfStudent(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) {
+    ResponseEntity<List<Course>> getCoursesOfStudent(@RequestHeader(HttpHeaders.AUTHORIZATION) String token) throws Exception {
         LOGGER.info("start getCoursesOfStudent method");
         List<Course> list = null;
-        try {
-            Jwt jwt = Utils.decodeJwt(token);
-            String username = jwt.getSub();
-            list = courseRepository.getCoursesByStudentId(username);
-        } catch (Exception exception) {
-            LOGGER.error(exception.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        Jwt jwt = Utils.decodeJwt(token);
+        String username = jwt.getSub();
+        list = courseRepository.getCoursesByStudentId(username);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
